@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fun Facts Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0d0d0d;
+            --card: #161616;
+            --border: #2a2a2a;
+            --accent: #c8f135;
+            --accent-dim: #a5c72a;
+            --text: #f0f0f0;
+            --muted: #666;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: var(--text);
+        }
+
+        /* Subtle dot grid background */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: radial-gradient(circle, #2a2a2a 1px, transparent 1px);
+            background-size: 32px 32px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 48px 44px;
+            max-width: 580px;
+            width: 100%;
+        }
+
+        /* Accent top bar */
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 24px; right: 24px;
+            height: 3px;
+            background: var(--accent);
+            border-radius: 0 0 4px 4px;
+        }
+
+        .tag {
+            display: inline-block;
+            background: var(--accent);
+            color: #0d0d0d;
+            font-family: 'Syne', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 100px;
+            margin-bottom: 20px;
+        }
+
+        .title {
+            font-family: 'Syne', sans-serif;
+            font-size: 2.6rem;
+            font-weight: 800;
+            color: var(--text);
+            line-height: 1.1;
+            margin-bottom: 8px;
+        }
+
+        .title span {
+            color: var(--accent);
+        }
+
+        .subtitle {
+            font-size: 0.95rem;
+            color: var(--muted);
+            margin-bottom: 36px;
+        }
+
+        .fact-box {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px 28px;
+            min-height: 130px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 28px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Decorative quote mark */
+        .fact-box::before {
+            content: '"';
+            position: absolute;
+            top: -10px; left: 16px;
+            font-family: 'Syne', sans-serif;
+            font-size: 7rem;
+            color: var(--border);
+            line-height: 1;
+            pointer-events: none;
+        }
+
+        .fact-text {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: var(--text);
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .fact-text.placeholder {
+            color: var(--muted);
+            font-style: italic;
+        }
+
+        .fact-text.loading {
+            color: var(--accent);
+            font-style: italic;
+            animation: pulse 1.2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .generate-btn {
+            width: 100%;
+            background: var(--accent);
+            color: #0d0d0d;
+            border: none;
+            padding: 16px 30px;
+            font-family: 'Syne', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .generate-btn:hover {
+            background: var(--accent-dim);
+            transform: translateY(-2px);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-icon {
+            font-size: 1.2rem;
+            transition: transform 0.4s;
+        }
+
+        .generate-btn:not(:disabled):hover .btn-icon {
+            transform: rotate(90deg);
+        }
+
+        .footer {
+            margin-top: 28px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+
+        .footer-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+        }
+
+        .error-msg {
+            color: #ff6b6b;
+            font-style: italic;
+        }
+
+        @media (max-width: 480px) {
+            .container { padding: 36px 24px; }
+            .title { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="tag">☁ Cloud Facts</div>
+        <h1 class="title">Fun <span>Facts</span><br>Generator</h1>
+        <p class="subtitle">Discover amazing facts about cloud computing.</p>
+
+        <div class="fact-box">
+            <p class="fact-text placeholder" id="factText">Hit generate to get your first fact.</p>
+        </div>
+
+        <button class="generate-btn" id="generateBtn" onclick="getFact()">
+            <span class="btn-icon">✦</span> Generate a Fact
+        </button>
+
+        
+    </div>
+
+    <script>
+        const API_URL = YOUR_API_URL;//PUT YOUR API ENDPOINT FROM API GATEWAY 
+        
+        async function getFact() {
+            const btn = document.getElementById('generateBtn');
+            const factText = document.getElementById('factText');
+            
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="btn-icon">⟳</span> Loading...';
+            factText.textContent = 'Fetching your fact...';
+            factText.className = 'fact-text loading';
+
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                factText.textContent = data.fact;
+                factText.className = 'fact-text';
+            } catch (error) {
+                factText.textContent = 'Unable to fetch fact. Please try again.';
+                factText.className = 'fact-text error-msg';
+                console.error('Error:', error);
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = '<span class="btn-icon">✦</span> Generate Another';
+        }
+    </script>
+</body>
+</html>
